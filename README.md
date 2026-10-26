@@ -3,14 +3,15 @@
 **Online calibration of neural volatility forecasts with early, one-sided feedback.**
 Akshat Valse · Iowa State University (Statistics, Mathematics, Data Science, Computer Science) · research project, 2026
 
-This page is a public overview. The code, data pipeline, proofs, experiment logs and write-ups live in a
-private repository; I am glad to walk through any of it on request ([GitHub profile](https://github.com/AkshatValse)).
+This page is a public overview. The code, results, proofs, experiment logs and write-ups remain private
+pending publication. I am happy to discuss the methods and my contributions within those limits
+([GitHub profile](https://github.com/AkshatValse)).
 
 ## The problem
 
 Risk forecasts for a *cumulative* quantity, such as the realized variance of an asset over the next six or
-twenty-four hours, are only scored when the horizon ends. Every online calibration method therefore learns
-with a delay of one full horizon, which is exactly when it is slowest to react to a volatility shift.
+twenty-four hours, are usually scored when the horizon ends. A calibrator that waits for the complete
+outcome receives feedback one full horizon later, which can slow its response to a volatility shift.
 
 Cumulative targets have a structure that is usually ignored: their increments are non-negative, so the
 running partial sum is monotone. If the partial sum crosses the issued upper bound before the horizon
@@ -28,23 +29,26 @@ convolutional network, a HAR-type regression, or an EWMA model) and
 - applies a bounded correction only when the accounting justifies it.
 
 The research question is whether this recovers faster after volatility jumps than delayed-feedback
-adaptive conformal inference and the strongest multi-step online conformal baseline, *without*
+adaptive conformal inference and a multi-step online conformal reference baseline, *without*
 systematically widening the bounds the rest of the time.
 
 ## What has been built
 
-- **Theory.** A long-run coverage guarantee for the calibrator under early crediting, a bounded
-  correction and missing data, with tightened constants and a sharpness construction; the proof was
-  checked by independent reviewers and numerically over tens of thousands of adversarial runs.
+- **Theory.** A draft long-run coverage guarantee for the calibrator under stated assumptions on early
+  crediting, bounded corrections and missing data, with a sharpness construction. Invariant tests and
+  adversarial numerical checks test consequences of the proposed argument; numerical agreement does
+  not establish the theorem.
 - **Data pipeline.** Binance 5-minute spot bars for BTCUSDT and ETHUSDT (2020–2025), with per-file
   timestamp-unit detection, verified checksums, gap and halt reconciliation, strict no-look-ahead
-  features and labels, a sealed test set written once and hashed, and an independent leakage audit.
-- **Simulation study.** Regime-shift data-generating processes with exact oracle quantiles, a
+  features and labels, a sealed test set written once and hashed, and automated leakage checks.
+- **Simulation framework.** Regime-shift data-generating processes with exact oracle quantiles, a
   pre-registered hypothesis set, event-level inference for recovery, null-regime diagnostics for
-  over-widening, and an equal-budget model-selection rule applied before any real-data comparison.
-- **Baselines.** Delayed-feedback ACI and quantile tracking, a faithful port of the multi-step online
-  conformal reference implementation with a fidelity harness against the original R package, classical
-  volatility models, and a compact TCN trained on Apple-silicon and HPC GPUs.
+  over-widening, and an equal-budget model-selection rule to apply before the full real-data comparison.
+  The main simulation study is still in progress.
+- **Baselines and models.** Implementations of delayed-feedback ACI and quantile tracking, classical
+  volatility models, and a compact TCN, with Apple-silicon and HPC GPU workflows. The Python port of the
+  multi-step online conformal reference implementation and its fidelity validation against the original
+  R package are in progress; full model training and comparative evaluation remain unfinished.
 
 ## How it is run
 
@@ -55,11 +59,12 @@ were overturned by measurement; the write-up keeps those corrections visible.
 
 ## Status (October 2026)
 
-Theory, data pipeline and simulation framework complete; simulation and real-data experiments in
-progress. Preliminary simulation evidence: the guarantee holds exactly as proved; most of the measured
-recovery gain comes from the pending-outcome accounting rather than from early crediting alone; and the
-event definition used to score recovery matters as much as the method. Paper in preparation.
+Active research (October 2026). The calibrator, data pipeline and simulation framework are implemented.
+The theory is presented as a proof draft; the main simulation study, baseline fidelity validation and
+full real-data evaluation are in progress. Preliminary checks inform the study design; final claims
+about recovery and comparative performance await the completed evaluation. Paper in preparation.
 
 ## Stack
 
 Python 3.12 · NumPy · pandas · PyTorch (MPS / CUDA) · statsmodels · SciPy · pytest · SLURM on ISU's Nova cluster · R (reference baseline)
+
